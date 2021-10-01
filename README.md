@@ -1,70 +1,18 @@
-# Getting Started with Create React App
+# Corona BLoom
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+21학년도 2학기 가천대학교 기계학습프로그래밍 프로젝트
 
-## Available Scripts
+## 프로젝트 선정 배경
+### 코로나 블루로 고통받는 사람들을 위해
+현재 세계는 전례 없는 팬데믹인 COVID 19를 겪고 있다. 이 대유행 속에서 사람들은 감염병에 걸리지 않을까 하는 두려움, 외출을 자주 하지 못하는 것에 대한 답답함 등으로 크고 작은 우울증을 겪고 있다.
+하지만 내가 우울증에 걸린 것을 스스로 진단 내리기는 힘든 일이다. 요즘 많이 우울하더라도 나아지겠지 하고 대수롭지 않게 넘겨 버리는 사람들도 많을 것이다.
+이러한 사람들을 위해 평소 본인이 쓰는 SNS 계정만 있다면 간단하게 본인의 우울증을 진단하는 것이 최종적인 이 프로젝트의 목표이다.
 
-In the project directory, you can run:
+## 제목 선정 이유
+### BLoom
+코로나로 인해 우울함 (Corona - BLue) 을 겪고 있는 모든 사람들에게 참고 기다리면 언젠가 꽃이 개화 (Bloom) 하는 날이 올 것이기에 꽃이 만개할 날을 기다리며 이 프로젝트를 선정하였기 때문에 BLoom 이라는 제목을 선정
 
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 데이터 확보 방안
+### AI Hub / Twitter, Facebook
+한국지능정보사회진흥원이 운영하는 AI Hub에서는 인공지능 학습에 필요한 여러 데이터셋을 제공해주고 있다. 그 중에서 감성 대화 말뭉치 데이터셋 혹은 한국어 감정 정보가 포함된 대화 데이터셋을 훈련 데이터로 삼을 계획이다.
+훈련 및 검증 단계가 끝나면 파이썬의 BeautifulSoup 혹은 Selenium을 이용하여 실제 SNS의 글 들을 스크랩한 뒤 감성 분석을 진행할 계획이다.
