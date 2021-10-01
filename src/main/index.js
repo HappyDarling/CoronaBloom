@@ -1,14 +1,14 @@
 import "./index.css";
-import axios from "axios";
 import React from "react";
 import { useHistory } from "react-router-dom";
+import axios from "axios";
 import { Form, Input, Button, Radio, Modal } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { API_URL } from "../config/constants.js";
 
 function MainPage() {
-  let history = useHistory();
   const { confirm } = Modal;
+  let history = useHistory();
 
   const onFinish = function (values) {
     // 저작권 관련 방지 대책
@@ -29,13 +29,19 @@ function MainPage() {
         cancelText: "취소",
         centered: true,
         onOk() {
+          // 서버에 post 해서 난수로 세션 키 값을 받아옴
+          // 받아온 세션 값을 클라이언트에 저장함
+          // result페이지로 넘김
           axios
             .post(`${API_URL}/`, {
               SNS: values.SNS,
               account: values.account,
+              password: values.Password,
             })
             .then((result) => {
-              console.log(result);
+              window.sessionStorage.setItem("SNS", result.data.SNS);
+              window.sessionStorage.setItem("account", result.data.account);
+              window.sessionStorage.setItem("auth", result.data.auth);
               history.push("/result");
             });
         },
@@ -57,7 +63,6 @@ function MainPage() {
             wrapperCol={{ span: 16 }}
             initialValues={{ remember: true }}
             onFinish={onFinish}
-            // onFinishFailed={onFinishFailed}
             autoComplete="off"
           >
             <div id="form-box-header">Corona BLoom</div>
