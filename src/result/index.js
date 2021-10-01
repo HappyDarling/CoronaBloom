@@ -1,17 +1,34 @@
+import React from "react";
+import { useHistory } from "react-router-dom";
 import axios from "axios";
+import { Modal } from "antd";
 import { API_URL } from "../config/constants.js";
 
+// DB 연동해서 SNS ID / 세션키 값으로 DB 생성
+// 매번 실행할때마다 DB 갱신
+
 function ResultPage() {
-  // Use Effect
-  // axios
-  //   .post(`${API_URL}/`, {
-  //     SNS: values.SNS,
-  //     account: values.account,
-  //   })
-  //   .then((result) => {
-  //     console.log(result);
-  //     history.push("/result");
-  //   });
+  let history = useHistory();
+  React.useEffect(() => {
+    axios
+      .post(`${API_URL}/result`, {
+        SNS: window.sessionStorage.getItem("SNS"),
+        account: window.sessionStorage.getItem("account"),
+        auth: window.sessionStorage.getItem("auth"),
+      })
+      .then((result) => {
+        const { Code, Title, Message } = result.data;
+        if (Code === (1, 2)) {
+          // 방어코드 응답
+          Modal.error({
+            title: Title,
+            content: Message,
+          });
+          history.push("/");
+        } else {
+        }
+      });
+  }, []);
 
   return (
     <div>
