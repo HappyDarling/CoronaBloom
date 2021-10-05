@@ -1,13 +1,15 @@
 import "./index.css";
-import React from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
-import { Form, Input, Button, Radio, Modal } from "antd";
+import { Form, Input, Button, Radio, Modal, Spin } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { API_URL } from "../config/constants.js";
 
 function MainPage() {
   const { confirm } = Modal;
+  // 동적인 값 관리하기 위한 useState
+  const [loading, setLoading] = useState(null);
   let history = useHistory();
 
   const onFinish = function (values) {
@@ -29,6 +31,8 @@ function MainPage() {
         cancelText: "취소",
         centered: true,
         onOk() {
+          // 중복 입력을 막기 위한 로딩바 생성
+          setLoading(true);
           // 서버에 post 해서 난수로 세션 키 값을 받아옴
           // 받아온 세션 값을 클라이언트에 저장함
           // result페이지로 넘김
@@ -39,13 +43,22 @@ function MainPage() {
               password: values.Password,
             })
             .then((result) => {
+              setLoading(false);
               window.sessionStorage.setItem("SNS", result.data.SNS);
               window.sessionStorage.setItem("account", result.data.account);
               window.sessionStorage.setItem("auth", result.data.auth);
               history.push("/result");
+            })
+            .catch((error) => {
+              setLoading(false);
+              Modal.error({
+                title: "ERROR",
+                content: "예상하지 못한 에러가 발생하였습니다.",
+              });
             });
         },
         onCancel() {
+          setLoading(false);
           console.log("Cancel");
         },
       });
@@ -57,58 +70,60 @@ function MainPage() {
       <div id="main-bg">
         <div id="main-header"></div>
         <div id="form-box">
-          <Form
-            name="basic"
-            labelCol={{ span: 8 }}
-            wrapperCol={{ span: 16 }}
-            initialValues={{ remember: true }}
-            onFinish={onFinish}
-            autoComplete="off"
-          >
-            <div id="form-box-header">Corona BLoom</div>
-            <Form.Item
-              label="SNS"
-              name="SNS"
-              rules={[
-                {
-                  required: true,
-                  message: "사용하시는 SNS 계정을 선택해주세요.",
-                },
-              ]}
+          <Spin tip="Loading..." size="large" spinning={loading}>
+            <Form
+              name="basic"
+              labelCol={{ span: 8 }}
+              wrapperCol={{ span: 16 }}
+              initialValues={{ remember: true }}
+              onFinish={onFinish}
+              autoComplete="off"
             >
-              <Radio.Group>
-                <Radio.Button value="Facebook">Facebook</Radio.Button>
-                <Radio.Button value="Twitter">Twitter</Radio.Button>
-              </Radio.Group>
-            </Form.Item>
+              <div id="form-box-header">Corona BLoom</div>
+              <Form.Item
+                label="SNS"
+                name="SNS"
+                rules={[
+                  {
+                    required: true,
+                    message: "사용하시는 SNS 계정을 선택해주세요.",
+                  },
+                ]}
+              >
+                <Radio.Group>
+                  <Radio.Button value="Facebook">Facebook</Radio.Button>
+                  <Radio.Button value="Twitter">Twitter</Radio.Button>
+                </Radio.Group>
+              </Form.Item>
 
-            <Form.Item
-              label="아이디"
-              name="account"
-              rules={[
-                {
-                  required: true,
-                  message: "사용하시는 SNS 계정을 입력해주세요.",
-                },
-              ]}
-            >
-              <Input style={{ width: "70%" }} />
-            </Form.Item>
+              <Form.Item
+                label="아이디"
+                name="account"
+                rules={[
+                  {
+                    required: true,
+                    message: "사용하시는 SNS 계정을 입력해주세요.",
+                  },
+                ]}
+              >
+                <Input style={{ width: "70%" }} />
+              </Form.Item>
 
-            <Form.Item
-              label="인증키"
-              name="Password"
-              rules={[{ required: true, message: "인증키를 입력해주세요." }]}
-            >
-              <Input.Password style={{ width: "70%" }} />
-            </Form.Item>
+              <Form.Item
+                label="인증키"
+                name="Password"
+                rules={[{ required: true, message: "인증키를 입력해주세요." }]}
+              >
+                <Input.Password style={{ width: "70%" }} />
+              </Form.Item>
 
-            <Form.Item wrapperCol={{ offset: 12, span: 16 }}>
-              <Button type="primary" htmlType="submit">
-                Submit
-              </Button>
-            </Form.Item>
-          </Form>
+              <Form.Item wrapperCol={{ offset: 12, span: 16 }}>
+                <Button type="primary" htmlType="submit">
+                  Submit
+                </Button>
+              </Form.Item>
+            </Form>
+          </Spin>
         </div>
         <div id="main-footer"></div>
       </div>
