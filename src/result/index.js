@@ -1,41 +1,96 @@
+import "./index.css";
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
-import { Modal, Row, Col, Descriptions, Badge, Tree } from "antd";
+import { Modal, Row, Col, Descriptions, Tree, Progress } from "antd";
 import { API_URL } from "../config/constants.js";
+
+var globalPredict, globalConv; // 서버에서 받아온 값 활용할 수 있는 Global 변수
 
 // DB 연동해서 SNS ID / 세션키 값으로 DB 생성
 // 매번 실행할때마다 DB 갱신
-
 function ResultPage() {
   let history = useHistory();
   const { DirectoryTree } = Tree;
 
-  const [loading, setLoading] = useState(null);
-
-  // 트리 목록 구성
-  const treeData = [
-    {
-      title: "parent 0",
-      key: "0-0",
-      children: [
-        { title: "leaf 0-0", key: "0-0-0", isLeaf: true },
-        { title: "leaf 0-1", key: "0-0-1", isLeaf: true },
-      ],
-    },
+  const [treeNode, setTree] = useState([
     {
       title: "parent 1",
-      key: "0-1",
+      key: "0-0",
       children: [
-        { title: "leaf 1-0", key: "0-1-0", isLeaf: true },
-        { title: "leaf 1-1", key: "0-1-1", isLeaf: true },
+        {
+          title: "parent 1-0",
+          key: "0-0-0",
+          children: [],
+        },
       ],
     },
-  ];
+  ]);
+
+  const [id, setId] = useState("ID_PLACEHOLDER");
+  const [nickname, setNickname] = useState("NICKNAME_PLACEHOLDER");
+  const [date, setDate] = useState("DATE_PLACEHOLDER");
+  const [day, setDay] = useState("DAY_PLACEHOLDER");
+  const [content, setContent] = useState("CONTENT_PLACEHOLDER");
+  const [percent, setPercent] = useState("0");
+
+  const setTreeNode = (data, conv) => {
+    var pKey = 0;
+    const myTreeNode = new Array();
+
+    for (var i in data) {
+      var cKey = 0;
+      const childNode = new Array();
+
+      for (var j in conv["userConv"][i]) {
+        childNode.push({
+          title: j,
+          key: `0-0-${pKey}-${cKey}`,
+        });
+        cKey++;
+      }
+
+      myTreeNode.push({
+        title: i,
+        key: `0-0-${pKey}`,
+        children: [...childNode],
+      });
+      pKey++;
+    }
+    setTree(myTreeNode);
+  };
+
+  // 트리 목록 구성
+  const treeData = treeNode;
 
   // Tree 구조 Select와 Expend 이벤트 처리
   const onSelect = (keys, info) => {
-    console.log("Trigger Select", keys, info);
+    var key = keys[0].split("-");
+    var dates = info["node"]["title"].split(".");
+    var date = dates[0] + "." + dates[1];
+    var pct = globalPredict[date][0][key[3]] * 100;
+    if (key.length == 3) {
+      var monthCnt = globalPredict[date][0].length;
+      var badCnt = 0;
+      for (var i = 0; i < monthCnt; i++) {
+        if (globalPredict[date][0][i] < 0.5) badCnt++;
+      }
+      var monthPct = (100 * badCnt) / monthCnt;
+
+      setId(globalConv["userID"]);
+      setNickname(globalConv["userNickName"]);
+      setDate(date);
+      setDay("-");
+      setContent("이번 달의 우울증 확률은 " + monthPct + "% 입니다.");
+      setPercent(monthPct.toFixed(2));
+    } else {
+      setId(globalConv["userID"]);
+      setNickname(globalConv["userNickName"]);
+      setDate(date);
+      setDay(info["node"]["title"]);
+      setContent(globalConv["userConv"][date][info["node"]["title"]]);
+      setPercent(pct.toFixed(2));
+    }
   };
   const onExpand = () => {
     console.log("Trigger Expand");
@@ -59,12 +114,16 @@ function ResultPage() {
           window.sessionStorage.clear();
           history.push("/");
         } else {
+          const { predict, conv } = result.data;
+          setTreeNode(predict, conv);
+          globalPredict = predict;
+          globalConv = conv;
         }
       })
       .catch((error) => {
         Modal.error({
           title: "ERROR",
-          content: "예상하지 못한 에러가 발생하였습니다.",
+          content: "예상하지 못한 에러가 발생하였습니다." + error,
         });
         window.sessionStorage.clear();
         history.push("/");
@@ -72,7 +131,7 @@ function ResultPage() {
   }, []);
 
   return (
-    <div>
+    <div id="container">
       {/* 만약 정상적인 경로로 접근하지 않았다면 "올바르지 않은 접근입니다." 메세지 출력 후 root 페이지로 이동 */}
       {/* Server에서 Response 하는 것 응답 대기 */}
 
@@ -91,39 +150,29 @@ function ResultPage() {
         </Col>
         <Col span={18}>
           <Descriptions title="User Info" bordered>
-            <Descriptions.Item label="사용자 아이디">
-              Cloud Database
+            <Descriptions.Item label="사용자 아이디" span={1}>
+              {id}
             </Descriptions.Item>
-            <Descriptions.Item label="닉네임">Prepaid</Descriptions.Item>
-            <Descriptions.Item label="Automatic Renewal">YES</Descriptions.Item>
-            <Descriptions.Item label="Order time">
-              2018-04-24 18:00:00
+            <Descriptions.Item label="닉네임" span={2}>
+              {nickname}
             </Descriptions.Item>
-            <Descriptions.Item label="Usage Time" span={2}>
-              2019-04-24 18:00:00
+            <Descriptions.Item label="작성 날짜">{date}</Descriptions.Item>
+            <Descriptions.Item label="작성 시간" span={2}>
+              {day}
             </Descriptions.Item>
-            <Descriptions.Item label="Status" span={3}>
-              <Badge status="processing" text="Running" />
+            <Descriptions.Item label="작성 내용" span={3}>
+              {content}
             </Descriptions.Item>
-            <Descriptions.Item label="Negotiated Amount">
-              $80.00
+            <Descriptions.Item label="감정 그래프" span={3}>
+              <Progress
+                percent={percent}
+                status="active"
+                strokeColor="#81c147"
+                trailColor="#ff095a"
+              />
             </Descriptions.Item>
-            <Descriptions.Item label="Discount">$20.00</Descriptions.Item>
-            <Descriptions.Item label="Official Receipts">
-              $60.00
-            </Descriptions.Item>
-            <Descriptions.Item label="Config Info">
-              Data disk type: MongoDB
-              <br />
-              Database version: 3.4
-              <br />
-              Package: dds.mongo.mid
-              <br />
-              Storage space: 10 GB
-              <br />
-              Replication factor: 3
-              <br />
-              Region: East China 1<br />
+            <Descriptions.Item label="결과" span={3}>
+              {percent} % 확률로 긍정적인 내용입니다.
             </Descriptions.Item>
           </Descriptions>
         </Col>
